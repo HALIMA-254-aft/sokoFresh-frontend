@@ -35,6 +35,30 @@ function vendorName(p) {
   return (p.vendor && (p.vendor.businessName || p.vendor.name)) || 'SokoFresh Vendor';
 }
 
+// Picks a produce icon from the name (keyword match), falling back to category.
+function produceEmoji(p) {
+  const n = (p && p.name ? p.name : '').toLowerCase();
+  const byName = [
+    [/avocado/, '🥑'], [/tomato/, '🍅'], [/carrot/, '🥕'],
+    [/(kale|sukuma|spinach|lettuce|cabbage|broccoli|green)/, '🥬'],
+    [/potato/, '🥔'], [/pineapple/, '🍍'], [/mango/, '🥭'],
+    [/banana|matoke/, '🍌'], [/onion/, '🧅'], [/garlic/, '🧄'],
+    [/(pepper|capsicum|pilipili|hoho)/, '🫑'], [/chil/, '🌶️'],
+    [/cucumber/, '🥒'], [/(maize|corn)/, '🌽'], [/orange/, '🍊'],
+    [/lemon|lime/, '🍋'], [/(passion|grape)/, '🍇'], [/apple/, '🍎'],
+    [/(bean|pea|njahi|ndengu|legume)/, '🫘'], [/eggplant|aubergine|brinjal|biringanya/, '🍆'],
+    [/strawberr/, '🍓'], [/watermelon/, '🍉'], [/coconut/, '🥥'],
+    [/mushroom/, '🍄'], [/ginger|turmeric|tangawizi/, '🫚'], [/rice|wheat|millet|sorghum|grain/, '🌾'],
+  ];
+  for (const [re, emoji] of byName) if (re.test(n)) return emoji;
+  const cat = (p && p.category ? p.category : '').toLowerCase();
+  if (cat === 'fruits') return '🍎';
+  if (cat === 'vegetables') return '🥬';
+  if (cat === 'tubers') return '🥔';
+  if (cat === 'grains') return '🌾';
+  return '🌿';
+}
+
 // ===================================================================
 //  AUTH
 // ===================================================================
@@ -273,8 +297,8 @@ function renderGrid() {
     const out = p.stockKg <= 0;
     return `
       <div class="card">
-        <div class="card-top">
-          <span class="leaf">${esc(p.name[0] || '🌿')}</span>
+        <div class="card-top ${out ? 'out' : ''}">
+          <span class="leaf">${produceEmoji(p)}</span>
           <span class="origin">${esc(vendorName(p))}</span>
         </div>
         <div class="card-body">
@@ -310,7 +334,7 @@ function addToCart(id) {
   const qty = state.qty[id] || 1;
   const existing = state.cart.find((c) => c.productId === id);
   if (existing) existing.quantityKg += qty;
-  else state.cart.push({ productId: id, name: p.name, vendor: vendorName(p), pricePerKg: p.pricePerKg, quantityKg: qty });
+  else state.cart.push({ productId: id, name: p.name, category: p.category, vendor: vendorName(p), pricePerKg: p.pricePerKg, quantityKg: qty });
   state.qty[id] = 1;
   renderGrid();
   renderCart();
@@ -332,6 +356,7 @@ function renderCart() {
   const body = state.cart.length
     ? state.cart.map((c) => `
         <div class="cart-line">
+          <span class="cart-thumb">${produceEmoji(c)}</span>
           <div class="info">
             <b>${esc(c.name)}</b>
             <small>${esc(c.vendor)} · ${money(c.pricePerKg)}/kg</small>
