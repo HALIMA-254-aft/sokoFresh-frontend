@@ -1,6 +1,7 @@
 // Wrapper around the SokoFresh API. Backend runs on its own origin.
 // In production, change API_BASE to your deployed backend URL.
-const API_BASE = 'http://localhost:5000';
+// Wrapper around the SokoFresh API. Backend runs on its own origin.
+const API_BASE = 'https://your-ngrok-url.ngrok-free.dev';
 
 const API = {
   token: localStorage.getItem('sf_token') || null,
@@ -12,7 +13,7 @@ const API = {
   },
 
   async request(method, path, body) {
-    const headers = { 'Content-Type': 'application/json' };
+    const headers = { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' };
     if (this.token) headers.Authorization = `Bearer ${this.token}`;
 
     const res = await fetch(API_BASE + '/api' + path, {
@@ -20,7 +21,6 @@ const API = {
       headers,
       body: body ? JSON.stringify(body) : undefined,
     });
-
     const text = await res.text();
     let data = null;
     if (text) {
