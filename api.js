@@ -1,8 +1,7 @@
 // Wrapper around the SokoFresh API. Backend runs on its own origin.
 // In production, change API_BASE to your deployed backend URL.
 // Wrapper around the SokoFresh API. Backend runs on its own origin.
-const API_BASE = 'https://your-ngrok-url.ngrok-free.dev';
-
+const API_BASE = 'https://rearmost-tania-microenvironmental.ngrok-free.dev';
 const API = {
   token: localStorage.getItem('sf_token') || null,
 
